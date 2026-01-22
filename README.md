@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# AI Chat Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Currently, two official plugins are available:
+A powerful Chrome Extension built to organize, manage, and persistently store your AI conversations from **Google Gemini** and **ChatGPT**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Say goodbye to cluttered chat histories. AI Chat Manager brings order to your AI workflow with nested folders, a dedicated side panel, and seamless one-click saving.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- **📂 Nested Folders**: Create unlimited nested structures to organize chats by topic, project, or date.
+- **💾 One-Click Save**: Automatically extracts the chat title and URL from the active tab.
+- **🔘 Floating Action Button**: A convenient floating button on Gemini and ChatGPT pages for instant access.
+- **🗄️ Persistence**: All data is stored locally in your browser and survives restarts.
+- **🎨 Modern UI**: Clean, responsive interface built with Tailwind CSS and Lucide Icons.
+- **🔄 Universal Adapter**: Extensible design support for multiple AI platforms (currently Gemini & ChatGPT).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Extension Framework**: Chrome Manifest V3 (Side Panel API)
+- **Frontend**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand) (with `persist` middleware)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## ⚙️ Installation & Setup
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [npm](https://www.npmjs.com/) (usually installed with Node.js)
+- Google Chrome (or Chromium-based browser)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/ai-chat-manager.git
+cd ai-chat-manager
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Install Dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+### 3. Build the Extension
+
+This will compile the TypeScript code and generate the `dist` folder.
+
+```bash
+npm run build
+```
+
+### 4. Load into Chrome
+
+1. Open Chrome and navigate to `chrome://extensions/`.
+2. Toggle **Developer mode** in the top right corner.
+3. Click **Load unpacked**.
+4. Select the `dist` folder located inside the project directory.
+
+---
+
+## 📖 Usage Guide
+
+### Opening the Manager
+- Click the **Extension Icon** in the browser toolbar.
+- OR click the **Floating Folder Button** on the bottom-right of any Gemini or ChatGPT page.
+
+### Organizing Chats
+1. **Create Folders**: Click "New Folder" or use the `+` icon on existing folders.
+2. **Save Chats**: Navigate to a chat page and click **"Save Chat"** in the sidebar.
+3. **Manage**: Use the `⋮` menu to rename or delete items.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you have suggestions for new AI platform adapters or features, feel free to open an issue or submit a pull request.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
