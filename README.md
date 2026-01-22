@@ -83,6 +83,19 @@ npm run build
 
 ---
 
+## 🔮 Roadmap & Future Features
+
+We are constantly working to improve AI Chat Manager. Here's what's coming next:
+
+- **🖱️ Drag & Drop Organization**: Intuitively move chats and folders around.
+- **🔍 Global Search**: Quickly find any chat in your library.
+- **📤 Export & Import**: Backup your data to JSON and restore it anywhere.
+- **🤖 More AI Adapters**: Support for Claude, Perplexity, and HuggingChat.
+- **🏷️ Tags & Favorites**: Pin important chats and organize with #tags.
+- **🌓 Dark/Light Mode**: User-selectable themes.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! If you have suggestions for new AI platform adapters or features, feel free to open an issue or submit a pull request.
