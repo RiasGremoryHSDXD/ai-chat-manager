@@ -1,0 +1,37 @@
+{
+    "manifest_version": 3,
+    "name": "AI Chat Manager",
+    "version": "1.0.0",
+    "description": "Manage and organize your AI chats from Gemini and ChatGPT.",
+    "permissions": [
+        "sidePanel",
+        "storage",
+        "tabs",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "*://gemini.google.com/*",
+        "*://chatgpt.com/*"
+    ],
+    "background": {
+        "service_worker": "assets/background.js",
+        "type": "module"
+    },
+    "side_panel": {
+        "default_path": "sidepanel.html"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://gemini.google.com/*",
+                "*://chatgpt.com/*"
+            ],
+            "js": [
+                "assets/content.js"
+            ]
+        }
+    ],
+    "action": {
+        "default_title": "Open AI Chat Manager"
+    }
+}
