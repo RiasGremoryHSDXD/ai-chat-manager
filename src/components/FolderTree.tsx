@@ -48,7 +48,7 @@ export const FolderTree: React.FC<FolderTreeProps> = ({ folderId }) => {
         <div>
             {/* Folder Row */}
             <div
-                className="flex items-center group py-1 px-2 hover:bg-gray-100 rounded-md cursor-pointer select-none"
+                className="flex items-center group py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer select-none transition-colors"
                 onClick={handleToggle}
             >
                 <span className="mr-1 text-gray-400">
@@ -60,14 +60,14 @@ export const FolderTree: React.FC<FolderTreeProps> = ({ folderId }) => {
                         <FolderOpen size={16} className="text-yellow-500 flex-shrink-0" /> :
                         <FolderIcon size={16} className="text-yellow-500 flex-shrink-0" />
                     }
-                    <span className="text-sm font-medium text-gray-800 truncate">{folder.name}</span>
-                    <span className="text-xs text-gray-400 ml-1">({folder.items.length + folder.children.length})</span>
+                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{folder.name}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">({folder.items.length + folder.children.length})</span>
                 </div>
 
                 <div className="opacity-0 group-hover:opacity-100 flex items-center">
                     <button
                         onClick={handleAddSubFolder}
-                        className="p-1 hover:bg-gray-200 rounded text-gray-500 mr-1"
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-gray-500 dark:text-gray-400 mr-1 transition-colors"
                         title="Add Subfolder"
                     >
                         <FolderIcon size={12} />+
@@ -78,7 +78,7 @@ export const FolderTree: React.FC<FolderTreeProps> = ({ folderId }) => {
 
             {/* Children */}
             {folder.isOpen && (
-                <div className="ml-4 border-l border-gray-200 pl-1">
+                <div className="ml-4 border-l border-gray-200 dark:border-gray-700 pl-1">
                     {folder.children.map((childId) => (
                         <FolderTree key={childId} folderId={childId} />
                     ))}
