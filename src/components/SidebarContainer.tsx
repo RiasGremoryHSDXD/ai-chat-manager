@@ -1,18 +1,30 @@
 import React, { useState } from 'react';
-import { FolderPlus, Save, Settings } from 'lucide-react';
+import { FolderPlus, Save, Settings, Moon, Sun } from 'lucide-react';
 import { useFolderStore } from '../store/folderStore';
 import { FolderTree } from './FolderTree';
+import { useTheme } from '../context/ThemeContext';
 
 export const SidebarContainer: React.FC = () => {
     const rootFolderIds = useFolderStore((state) => state.rootFolderIds);
     const addFolder = useFolderStore((state) => state.addFolder);
     const saveChat = useFolderStore((state) => state.saveChat);
+    const { theme, setTheme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const handleAddRootFolder = () => {
         const name = prompt("New Folder Name:");
         if (name) addFolder(name);
+    };
+
+    const toggleTheme = () => {
+        if (theme === 'dark') setTheme('light');
+        else setTheme('dark');
+    };
+
+    const getThemeIcon = () => {
+        if (theme === 'light') return <Sun size={18} />;
+        return <Moon size={18} />;
     };
 
     const handleSaveCurrentChat = async () => {
@@ -58,21 +70,28 @@ export const SidebarContainer: React.FC = () => {
     // Store initializes empty.
 
     return (
-        <div className="h-screen flex flex-col bg-white w-full">
+        <div className="h-screen flex flex-col bg-white dark:bg-gray-900 w-full text-gray-800 dark:text-gray-100 transition-colors duration-200">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200 shadow-sm flex items-center justify-between sticky top-0 bg-white z-10">
-                <h1 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-between sticky top-0 bg-white dark:bg-gray-900 z-10 transition-colors duration-200">
+                <h1 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                     <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text">AI Folders</span>
                 </h1>
                 <div className="flex items-center gap-1">
-                    <button className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+                    <button
+                        onClick={toggleTheme}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-400 transition-colors"
+                        title="Toggle Theme"
+                    >
+                        {getThemeIcon()}
+                    </button>
+                    <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-400 transition-colors">
                         <Settings size={18} />
                     </button>
                 </div>
             </div>
 
             {/* Actions */}
-            <div className="p-3 grid grid-cols-2 gap-2 border-b border-gray-100">
+            <div className="p-3 grid grid-cols-2 gap-2 border-b border-gray-100 dark:border-gray-800 transition-colors duration-200">
                 <button
                     onClick={handleSaveCurrentChat}
                     disabled={loading}
@@ -83,7 +102,7 @@ export const SidebarContainer: React.FC = () => {
                 </button>
                 <button
                     onClick={handleAddRootFolder}
-                    className="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-md text-sm font-medium transition-colors"
+                    className="flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-md text-sm font-medium transition-colors"
                 >
                     <FolderPlus size={16} /> New Folder
                 </button>
@@ -91,7 +110,7 @@ export const SidebarContainer: React.FC = () => {
 
             {/* Error Message */}
             {error && (
-                <div className="bg-red-50 text-red-600 text-xs p-2 text-center border-b border-red-100">
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs p-2 text-center border-b border-red-100 dark:border-red-900/50">
                     {error}
                 </div>
             )}

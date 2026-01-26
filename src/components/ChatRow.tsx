@@ -32,10 +32,10 @@ export const ChatRow: React.FC<ChatRowProps> = ({ chatId }) => {
     };
 
     return (
-        <div className="flex items-center group py-1 px-2 hover:bg-gray-100 rounded-md cursor-pointer ml-4">
+        <div className="flex items-center group py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer ml-4 transition-colors">
             <div className="flex-1 flex items-center gap-2 min-w-0" onClick={handleOpen}>
                 <MessageSquare size={14} className="text-blue-500 flex-shrink-0" />
-                <span className="text-sm truncate text-gray-700 group-hover:text-blue-600">
+                <span className="text-sm truncate text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {chat.title}
                 </span>
             </div>
