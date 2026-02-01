@@ -16,6 +16,8 @@ export interface Chat {
     title: string;
     url: string;
     platform: 'gemini' | 'chatgpt' | 'other';
+    pinned?: boolean;
+    tags?: string[];
     createdAt: number;
 }
 
@@ -37,6 +39,9 @@ interface FolderState {
     saveChat: (chatData: ChatObject, folderId?: string) => void;
     toggleFolder: (folderId: string) => void;
     importData: (data: Partial<FolderState>) => void;
+    toggleChatPin: (chatId: string) => void;
+    addTag: (chatId: string, tag: string) => void;
+    removeTag: (chatId: string, tag: string) => void;
 }
 
 export const useFolderStore = create<FolderState>()(
@@ -234,6 +239,36 @@ export const useFolderStore = create<FolderState>()(
                     state.folders = data.folders || {};
                     state.chats = data.chats || {};
                     state.rootFolderIds = data.rootFolderIds || [];
+                });
+            },
+
+            toggleChatPin: (chatId) => {
+                set((state) => {
+                    if (state.chats[chatId]) {
+                        state.chats[chatId].pinned = !state.chats[chatId].pinned;
+                    }
+                });
+            },
+
+            addTag: (chatId, tag) => {
+                set((state) => {
+                    if (state.chats[chatId]) {
+                        if (!state.chats[chatId].tags) state.chats[chatId].tags = [];
+                        if (!state.chats[chatId].tags.includes(tag)) {
+                            state.chats[chatId].tags.push(tag);
+                        }
+                    }
+                });
+            },
+
+            removeTag: (chatId, tag) => {
+                set((state) => {
+                    if (state.chats[chatId] && state.chats[chatId].tags) {
+                        const idx = state.chats[chatId].tags.indexOf(tag);
+                        if (idx !== -1) {
+                            state.chats[chatId].tags.splice(idx, 1);
+                        }
+                    }
                 });
             },
         })),

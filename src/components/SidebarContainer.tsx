@@ -256,29 +256,58 @@ export const SidebarContainer: React.FC = () => {
                         // Search Results View
                         <div className="space-y-1">
                             {Object.values(chats)
-                                .filter(chat => chat.title.toLowerCase().includes(searchQuery.toLowerCase()))
+                                .filter(chat => {
+                                    const query = searchQuery.toLowerCase();
+                                    return chat.title.toLowerCase().includes(query) ||
+                                        chat.tags?.some(tag => tag.toLowerCase().includes(query));
+                                })
                                 .map(chat => (
-                                    <ChatRow key={chat.id} chatId={chat.id} />
+                                    <ChatRow key={chat.id} chatId={chat.id} dragId={`search-${chat.id}`} />
                                 ))
                             }
-                            {Object.values(chats).filter(chat => chat.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
-                                <div className="text-center text-gray-400 mt-4 text-sm">
-                                    No results found.
-                                </div>
-                            )}
+                            {Object.values(chats).filter(chat => {
+                                const query = searchQuery.toLowerCase();
+                                return chat.title.toLowerCase().includes(query) ||
+                                    chat.tags?.some(tag => tag.toLowerCase().includes(query));
+                            }).length === 0 && (
+                                    <div className="text-center text-gray-400 mt-4 text-sm">
+                                        No results found.
+                                    </div>
+                                )}
                         </div>
                     ) : (
-                        // Folder View
-                        rootFolderIds.length === 0 ? (
-                            <div className="text-center text-gray-400 mt-10">
-                                <p className="mb-2">No folders yet.</p>
-                                <p className="text-sm">Create one or save a chat!</p>
-                            </div>
-                        ) : (
-                            rootFolderIds.map(id => (
-                                <FolderTree key={id} folderId={id} />
-                            ))
-                        )
+                        // Normal View
+                        <>
+                            {/* Pinned Section */}
+                            {Object.values(chats).some(c => c.pinned) && (
+                                <div className="mb-4">
+                                    <div className="flex items-center gap-2 px-2 py-1 mb-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Pinned
+                                    </div>
+                                    <div className="space-y-1">
+                                        {Object.values(chats)
+                                            .filter(chat => chat.pinned)
+                                            .map(chat => (
+                                                <ChatRow key={`pinned-${chat.id}`} chatId={chat.id} dragId={`pinned-${chat.id}`} />
+                                            ))
+                                        }
+                                    </div>
+                                    <div className="my-2 border-b border-gray-100 dark:border-gray-800" />
+                                </div>
+                            )}
+
+                            {/* Folders */}
+                            {rootFolderIds.length === 0 ? (
+                                <div className="text-center text-gray-400 mt-10">
+                                    <p className="mb-2">No folders yet.</p>
+                                    <p className="text-sm">Create one or save a chat!</p>
+                                </div>
+                            ) : (
+                                rootFolderIds.map(id => (
+                                    <FolderTree key={id} folderId={id} />
+                                ))
+                            )}
+                        </>
                     )}
                 </div>
                 <DragOverlay>
