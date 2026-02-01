@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A powerful Chrome Extension built to organize, manage, and persistently store your AI conversations from **Google Gemini** and **ChatGPT**.
+A powerful Chrome Extension built to organize, manage, and persistently store your AI conversations from **Gemini, ChatGPT, Claude, DeepSeek, Perplexity, and HuggingChat**.
 
 Say goodbye to cluttered chat histories. AI Chat Manager brings order to your AI workflow with nested folders, a dedicated side panel, and seamless one-click saving.
 
