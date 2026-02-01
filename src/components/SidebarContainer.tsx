@@ -3,14 +3,32 @@ import { FolderPlus, Save, Settings, Moon, Sun } from 'lucide-react';
 import { useFolderStore } from '../store/folderStore';
 import { FolderTree } from './FolderTree';
 import { useTheme } from '../context/ThemeContext';
+import { DndContext, DragOverlay, useSensor, useSensors, MouseSensor, TouchSensor } from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 
 export const SidebarContainer: React.FC = () => {
     const rootFolderIds = useFolderStore((state) => state.rootFolderIds);
     const addFolder = useFolderStore((state) => state.addFolder);
     const saveChat = useFolderStore((state) => state.saveChat);
+    const moveItem = useFolderStore((state) => state.moveItem);
     const { theme, setTheme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [activeId, setActiveId] = useState<string | null>(null);
+
+    const sensors = useSensors(
+        useSensor(MouseSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 250,
+                tolerance: 5,
+            },
+        })
+    );
 
     const handleAddRootFolder = () => {
         const name = prompt("New Folder Name:");
@@ -34,7 +52,7 @@ export const SidebarContainer: React.FC = () => {
         // Check if we can access the active tab
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-            if (!tab || !tab.id) {
+            if (!tab?.id) {
                 setError("No active tab found.");
                 setLoading(false);
                 return;
@@ -44,16 +62,12 @@ export const SidebarContainer: React.FC = () => {
             chrome.tabs.sendMessage(tab.id, { action: 'SCRAPE_METADATA' }, (response) => {
                 setLoading(false);
                 if (chrome.runtime.lastError) {
-                    // If content script is not injected (e.g. on restricted pages or before reload)
-                    // We should probably check URL or try to inject?
-                    // For now, assume extension is reloaded or page is compatible.
                     setError("Could not connect to page. Refresh the page or ensure it's Gemini/ChatGPT.");
                     return;
                 }
 
-                if (response && response.success) {
+                if (response?.success) {
                     saveChat(response.data);
-                    // Maybe show success toast
                 } else {
                     setError(response?.error || "Failed to save chat.");
                 }
@@ -66,8 +80,24 @@ export const SidebarContainer: React.FC = () => {
         }
     };
 
-    // If no folders exist, maybe init default?
-    // Store initializes empty.
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(event.active.id as string);
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            // Check if dropping a chat (active) into a folder (over)
+            // We need to ensure active is a chat and over is a folder
+            // or we lean on moveItem to handle logic?
+            // SidebarContainer only knows IDs.
+            // Let's pass the move command.
+            // Note: Our moveItem implementation in store might need to be robust.
+            moveItem(active.id as string, over.id as string);
+        }
+        setActiveId(null);
+    };
 
     return (
         <div className="h-screen flex flex-col bg-white dark:bg-gray-900 w-full text-gray-800 dark:text-gray-100 transition-colors duration-200">
@@ -116,23 +146,29 @@ export const SidebarContainer: React.FC = () => {
             )}
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-2">
-                {rootFolderIds.length === 0 ? (
-                    <div className="text-center text-gray-400 mt-10">
-                        <p className="mb-2">No folders yet.</p>
-                        <p className="text-sm">Create one or save a chat!</p>
-                    </div>
-                ) : (
-                    rootFolderIds.map(id => (
-                        <FolderTree key={id} folderId={id} />
-                    ))
-                )}
-            </div>
-
-            {/* Footer / Status */}
-            {/* <div className="p-2 border-t text-xs text-gray-400 text-center">
-          v1.0.0
-      </div> */}
+            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+                <div className="flex-1 overflow-y-auto p-2">
+                    {rootFolderIds.length === 0 ? (
+                        <div className="text-center text-gray-400 mt-10">
+                            <p className="mb-2">No folders yet.</p>
+                            <p className="text-sm">Create one or save a chat!</p>
+                        </div>
+                    ) : (
+                        rootFolderIds.map(id => (
+                            <FolderTree key={id} folderId={id} />
+                        ))
+                    )}
+                </div>
+                <DragOverlay>
+                    {activeId ? (
+                        // Render a visual representation of what's being dragged
+                        // We can try to reuse ChatRow or a simplified version
+                        <div className="p-2 bg-white dark:bg-gray-800 shadow-lg rounded border border-blue-500 opacity-90 w-48 truncate pointer-events-none">
+                            Dragging Item...
+                        </div>
+                    ) : null}
+                </DragOverlay>
+            </DndContext>
         </div>
     );
 };
