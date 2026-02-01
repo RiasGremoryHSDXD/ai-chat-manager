@@ -15,6 +15,7 @@ export const SidebarContainer: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
+    const [showSettings, setShowSettings] = useState(false);
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
@@ -114,14 +115,71 @@ export const SidebarContainer: React.FC = () => {
                     >
                         {getThemeIcon()}
                     </button>
-                    <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-400 transition-colors">
-                        <Settings size={18} />
-                    </button>
+                    <div className="relative group">
+                        <button
+                            onClick={() => setShowSettings(!showSettings)}
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-400 transition-colors"
+                        >
+                            <Settings size={18} />
+                        </button>
+                        {/* Dropdown Menu */}
+                        {showSettings && (
+                            <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+                                <button
+                                    onClick={() => {
+                                        const state = useFolderStore.getState();
+
+                                        // Filter chats to only include those referenced in folders
+                                        const referencedChatIds = new Set<string>();
+                                        Object.values(state.folders).forEach(folder => {
+                                            folder.items.forEach(itemId => referencedChatIds.add(itemId));
+                                            // Also add items from root? Currently rootFolderIds points to folders, 
+                                            // but if we ever allow root chats in the future, we'd need to check that too.
+                                            // As per store logic, items only exist in folders.
+                                        });
+
+                                        const cleanedChats: Record<string, any> = {};
+                                        referencedChatIds.forEach(id => {
+                                            if (state.chats[id]) {
+                                                cleanedChats[id] = state.chats[id];
+                                            }
+                                        });
+
+                                        const data = {
+                                            folders: state.folders,
+                                            chats: cleanedChats,
+                                            rootFolderIds: state.rootFolderIds
+                                        };
+                                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `ai-chat-manager-backup-${new Date().toISOString().split('T')[0]}.json`;
+                                        a.click();
+                                        URL.revokeObjectURL(url);
+                                        setShowSettings(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                >
+                                    <FolderPlus size={14} className="rotate-180" /> Export Data
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        document.getElementById('import-file')?.click();
+                                        setShowSettings(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                >
+                                    <FolderPlus size={14} /> Import Data
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Actions */}
-            <div className="p-3 grid grid-cols-2 gap-2 border-b border-gray-100 dark:border-gray-800 transition-colors duration-200">
+            <div className="p-3 grid grid-cols-2 gap-2 border-b border-gray-100 dark:border-gray-800 transition-colors duration-200 relative">
                 <button
                     onClick={handleSaveCurrentChat}
                     disabled={loading}
@@ -137,6 +195,36 @@ export const SidebarContainer: React.FC = () => {
                     <FolderPlus size={16} /> New Folder
                 </button>
             </div>
+
+            {/* Settings Components (Export/Import) */}
+            <input
+                type="file"
+                id="import-file"
+                accept=".json"
+                className="hidden"
+                onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const data = JSON.parse(e.target?.result as string);
+                                if (data && typeof data === 'object') {
+                                    if (confirm('This will overwrite all current data. Proceed?')) {
+                                        useFolderStore.getState().importData(data);
+                                        // Force reload to ensure UI updates if needed, though Zustand should handle it
+                                    }
+                                }
+                            } catch (err) {
+                                alert('Invalid JSON file');
+                            }
+                        };
+                        reader.readAsText(file);
+                        // Reset value so same file can be selected again
+                        e.target.value = '';
+                    }
+                }}
+            />
 
             {/* Error Message */}
             {error && (
