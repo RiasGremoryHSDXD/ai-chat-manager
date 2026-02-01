@@ -67,6 +67,10 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
                 let platform = 'other';
                 if (url.includes('gemini.google.com')) platform = 'gemini';
                 else if (url.includes('chatgpt.com')) platform = 'chatgpt';
+                else if (url.includes('claude.ai')) platform = 'claude';
+                else if (url.includes('deepseek.com')) platform = 'deepseek';
+                else if (url.includes('perplexity.ai')) platform = 'perplexity';
+                else if (url.includes('huggingface.co/chat')) platform = 'huggingchat';
 
                 sendResponse({
                     success: true,
@@ -99,9 +103,13 @@ document.addEventListener('dragstart', (e) => {
         // However, user might want to drag *any* link? The prompt says "drag the new chat".
         // Let's allow it but try to be smart about titles.
 
-        let platform: 'gemini' | 'chatgpt' | 'other' = 'other';
+        let platform: 'gemini' | 'chatgpt' | 'claude' | 'deepseek' | 'perplexity' | 'huggingchat' | 'other' = 'other';
         if (link.href.includes('gemini.google.com')) platform = 'gemini';
         else if (link.href.includes('chatgpt.com')) platform = 'chatgpt';
+        else if (link.href.includes('claude.ai')) platform = 'claude';
+        else if (link.href.includes('deepseek.com')) platform = 'deepseek';
+        else if (link.href.includes('perplexity.ai')) platform = 'perplexity';
+        else if (link.href.includes('huggingface.co/chat')) platform = 'huggingchat';
 
         // Attempt to get a better title
         // In Gemini sidebar, the title is usually in a div/span inside the link

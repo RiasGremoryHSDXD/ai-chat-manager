@@ -15,7 +15,7 @@ export interface Chat {
     id: string;
     title: string;
     url: string;
-    platform: 'gemini' | 'chatgpt' | 'other';
+    platform: 'gemini' | 'chatgpt' | 'claude' | 'deepseek' | 'perplexity' | 'huggingchat' | 'other';
     pinned?: boolean;
     tags?: string[];
     createdAt: number;
@@ -24,7 +24,7 @@ export interface Chat {
 interface ChatObject {
     title: string;
     url: string;
-    platform: 'gemini' | 'chatgpt' | 'other';
+    platform: 'gemini' | 'chatgpt' | 'claude' | 'deepseek' | 'perplexity' | 'huggingchat' | 'other';
 }
 
 interface FolderState {
