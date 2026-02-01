@@ -3,6 +3,7 @@ import { Folder as FolderIcon, FolderOpen, ChevronRight, ChevronDown } from 'luc
 import { useFolderStore } from '../store/folderStore';
 import { ChatRow } from './ChatRow';
 import { ActionMenu } from './ActionMenu';
+import { useDroppable } from '@dnd-kit/core';
 
 interface FolderTreeProps {
     folderId: string;
@@ -14,6 +15,14 @@ export const FolderTree: React.FC<FolderTreeProps> = ({ folderId }) => {
     const deleteItem = useFolderStore((state) => state.deleteItem);
     const renameItem = useFolderStore((state) => state.renameItem);
     const addFolder = useFolderStore((state) => state.addFolder);
+
+    const { setNodeRef, isOver } = useDroppable({
+        id: folderId,
+        data: {
+            type: 'folder',
+            name: folder?.name,
+        }
+    });
 
     // If folder doesn't exist (e.g. deleted), don't render
     if (!folder) return null;
@@ -30,7 +39,7 @@ export const FolderTree: React.FC<FolderTreeProps> = ({ folderId }) => {
 
     const handleRename = () => {
         const newName = prompt("Rename folder:", folder.name);
-        if (newName && newName.trim()) {
+        if (newName?.trim()) {
             renameItem(folderId, newName.trim(), true);
         }
     };
@@ -44,12 +53,23 @@ export const FolderTree: React.FC<FolderTreeProps> = ({ folderId }) => {
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleToggle();
+        }
+    };
+
     return (
         <div>
             {/* Folder Row */}
             <div
-                className="flex items-center group py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer select-none transition-colors"
+                ref={setNodeRef}
+                className={`flex items-center group py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer select-none transition-colors ${isOver ? 'bg-blue-100 dark:bg-blue-900/40 ring-1 ring-blue-400' : ''}`}
                 onClick={handleToggle}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={0}
             >
                 <span className="mr-1 text-gray-400">
                     {folder.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
