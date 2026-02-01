@@ -11,7 +11,11 @@
     ],
     "host_permissions": [
         "*://gemini.google.com/*",
-        "*://chatgpt.com/*"
+        "*://chatgpt.com/*",
+        "*://claude.ai/*",
+        "*://chat.deepseek.com/*",
+        "*://www.perplexity.ai/*",
+        "*://huggingface.co/chat/*"
     ],
     "background": {
         "service_worker": "assets/background.js",
@@ -24,7 +28,11 @@
         {
             "matches": [
                 "*://gemini.google.com/*",
-                "*://chatgpt.com/*"
+                "*://chatgpt.com/*",
+                "*://claude.ai/*",
+                "*://chat.deepseek.com/*",
+                "*://www.perplexity.ai/*",
+                "*://huggingface.co/chat/*"
             ],
             "js": [
                 "assets/content.js"
