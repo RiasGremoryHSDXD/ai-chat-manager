@@ -36,6 +36,7 @@ interface FolderState {
     moveItem: (id: string, newParentId: string) => void;
     saveChat: (chatData: ChatObject, folderId?: string) => void;
     toggleFolder: (folderId: string) => void;
+    importData: (data: Partial<FolderState>) => void;
 }
 
 export const useFolderStore = create<FolderState>()(
@@ -67,15 +68,12 @@ export const useFolderStore = create<FolderState>()(
 
             deleteItem: (id, isFolder) => {
                 set((state) => {
-                    // Helper to remove id from parent's children or items
                     const removeFromParent = (itemId: string, isFolderArg: boolean) => {
-                        // Check roots
                         const rootIndex = state.rootFolderIds.indexOf(itemId);
                         if (rootIndex !== -1 && isFolderArg) {
                             state.rootFolderIds.splice(rootIndex, 1);
                             return;
                         }
-                        // Check access all folders to find parent
                         for (const key in state.folders) {
                             const folder = state.folders[key];
                             if (isFolderArg) {
@@ -94,10 +92,26 @@ export const useFolderStore = create<FolderState>()(
                         }
                     };
 
+                    const deleteFolderRecursive = (folderId: string) => {
+                        const folder = state.folders[folderId];
+                        if (!folder) return;
+
+                        // Delete all chats in this folder
+                        folder.items.forEach(chatId => {
+                            delete state.chats[chatId];
+                        });
+
+                        // Recursively delete subfolders
+                        folder.children.forEach(subFolderId => {
+                            deleteFolderRecursive(subFolderId);
+                        });
+
+                        // Finally delete the folder itself
+                        delete state.folders[folderId];
+                    };
+
                     if (isFolder) {
-                        // Recursive delete logic could be added here to clean up children
-                        // For now, simplist deletion of the node and reference
-                        delete state.folders[id];
+                        deleteFolderRecursive(id);
                         removeFromParent(id, true);
                     } else {
                         delete state.chats[id];
@@ -211,6 +225,15 @@ export const useFolderStore = create<FolderState>()(
                     if (state.folders[folderId]) {
                         state.folders[folderId].isOpen = !state.folders[folderId].isOpen;
                     }
+                });
+            },
+
+            importData: (data) => {
+                set((state) => {
+                    // Basic validation could happen here or in component
+                    state.folders = data.folders || {};
+                    state.chats = data.chats || {};
+                    state.rootFolderIds = data.rootFolderIds || [];
                 });
             },
         })),
