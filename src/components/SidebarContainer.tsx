@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FolderPlus, Save, Settings, Moon, Sun } from 'lucide-react';
+import { FolderPlus, Save, Settings, Moon, Sun, Search } from 'lucide-react';
 import { useFolderStore } from '../store/folderStore';
 import { FolderTree } from './FolderTree';
+import { ChatRow } from './ChatRow';
 import { useTheme } from '../context/ThemeContext';
 import { DndContext, DragOverlay, useSensor, useSensors, MouseSensor, TouchSensor } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
@@ -16,6 +17,9 @@ export const SidebarContainer: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [showSettings, setShowSettings] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const chats = useFolderStore((state) => state.chats);
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
@@ -196,6 +200,20 @@ export const SidebarContainer: React.FC = () => {
                 </button>
             </div>
 
+            {/* Search Bar */}
+            <div className="px-3 py-2">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                    <input
+                        type="text"
+                        placeholder="Search chats..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-9 pr-3 py-1.5 bg-gray-100 dark:bg-gray-800 border-none rounded-md text-sm text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                    />
+                </div>
+            </div>
+
             {/* Settings Components (Export/Import) */}
             <input
                 type="file"
@@ -212,7 +230,6 @@ export const SidebarContainer: React.FC = () => {
                                 if (data && typeof data === 'object') {
                                     if (confirm('This will overwrite all current data. Proceed?')) {
                                         useFolderStore.getState().importData(data);
-                                        // Force reload to ensure UI updates if needed, though Zustand should handle it
                                     }
                                 }
                             } catch (err) {
@@ -220,7 +237,6 @@ export const SidebarContainer: React.FC = () => {
                             }
                         };
                         reader.readAsText(file);
-                        // Reset value so same file can be selected again
                         e.target.value = '';
                     }
                 }}
@@ -236,21 +252,37 @@ export const SidebarContainer: React.FC = () => {
             {/* Content */}
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                 <div className="flex-1 overflow-y-auto p-2">
-                    {rootFolderIds.length === 0 ? (
-                        <div className="text-center text-gray-400 mt-10">
-                            <p className="mb-2">No folders yet.</p>
-                            <p className="text-sm">Create one or save a chat!</p>
+                    {searchQuery ? (
+                        // Search Results View
+                        <div className="space-y-1">
+                            {Object.values(chats)
+                                .filter(chat => chat.title.toLowerCase().includes(searchQuery.toLowerCase()))
+                                .map(chat => (
+                                    <ChatRow key={chat.id} chatId={chat.id} />
+                                ))
+                            }
+                            {Object.values(chats).filter(chat => chat.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                                <div className="text-center text-gray-400 mt-4 text-sm">
+                                    No results found.
+                                </div>
+                            )}
                         </div>
                     ) : (
-                        rootFolderIds.map(id => (
-                            <FolderTree key={id} folderId={id} />
-                        ))
+                        // Folder View
+                        rootFolderIds.length === 0 ? (
+                            <div className="text-center text-gray-400 mt-10">
+                                <p className="mb-2">No folders yet.</p>
+                                <p className="text-sm">Create one or save a chat!</p>
+                            </div>
+                        ) : (
+                            rootFolderIds.map(id => (
+                                <FolderTree key={id} folderId={id} />
+                            ))
+                        )
                     )}
                 </div>
                 <DragOverlay>
                     {activeId ? (
-                        // Render a visual representation of what's being dragged
-                        // We can try to reuse ChatRow or a simplified version
                         <div className="p-2 bg-white dark:bg-gray-800 shadow-lg rounded border border-blue-500 opacity-90 w-48 truncate pointer-events-none">
                             Dragging Item...
                         </div>
