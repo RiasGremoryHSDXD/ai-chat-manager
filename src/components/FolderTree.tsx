@@ -70,6 +70,32 @@ export const FolderTree: React.FC<FolderTreeProps> = ({ folderId }) => {
                 onKeyDown={handleKeyDown}
                 role="button"
                 tabIndex={0}
+                onDragOver={(e) => {
+                    e.preventDefault(); // Allow drop
+                    e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const data = e.dataTransfer.getData('application/json');
+                    if (data) {
+                        try {
+                            const chatData = JSON.parse(data);
+                            // Verify it's our data
+                            if (chatData.source === 'ai-chat-manager-drag') {
+                                // Add logic to save chat to this folder
+                                const addChatToFolder = useFolderStore.getState().saveChat;
+                                addChatToFolder({
+                                    title: chatData.title,
+                                    url: chatData.url,
+                                    platform: chatData.platform
+                                }, folderId);
+                            }
+                        } catch (err) {
+                            console.error('Failed to parse drop data', err);
+                        }
+                    }
+                }}
             >
                 <span className="mr-1 text-gray-400">
                     {folder.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}

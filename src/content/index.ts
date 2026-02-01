@@ -86,3 +86,42 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     }
     return true; // Keep message channel open
 });
+
+
+// Handle Drag Start globally to capture links
+document.addEventListener('dragstart', (e) => {
+    const target = e.target as HTMLElement;
+    // Find closest anchor tag
+    const link = target.closest('a');
+
+    if (link && link.href) {
+        // Basic filter for known chat URLs to avoid dragging random links causing saves
+        // However, user might want to drag *any* link? The prompt says "drag the new chat".
+        // Let's allow it but try to be smart about titles.
+
+        let platform: 'gemini' | 'chatgpt' | 'other' = 'other';
+        if (link.href.includes('gemini.google.com')) platform = 'gemini';
+        else if (link.href.includes('chatgpt.com')) platform = 'chatgpt';
+
+        // Attempt to get a better title
+        // In Gemini sidebar, the title is usually in a div/span inside the link
+        let title = link.innerText || link.textContent || 'Untitled Chat';
+
+        // Clean up title (remove newlines, extra spaces)
+        title = title.replace(/\s+/g, ' ').trim();
+
+        if (title.length > 50) title = title.substring(0, 50) + '...';
+
+        const chatData = {
+            title,
+            url: link.href,
+            platform,
+            source: 'ai-chat-manager-drag' // Signature to verify on drop
+        };
+
+        // We use a custom MIME type or just standard json to identify our drop
+        e.dataTransfer?.setData('application/json', JSON.stringify(chatData));
+        // Also set text for debugging
+        e.dataTransfer?.setData('text/plain', link.href);
+    }
+});
