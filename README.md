@@ -81,6 +81,11 @@ npm run build
 2. **Save Chats**: Navigate to a chat page and click **"Save Chat"** in the sidebar.
 3. **Manage**: Use the `⋮` menu to rename or delete items.
 
+### 📌 Pinning & Tagging
+- **Pin Chats**: Hover over a chat, click the **Menu (⋮)**, and select **Pin**. Pinned chats stick to the top for instant access.
+- **Add Tags**: Select **Add Tag** from the menu to label chats (e.g., `#work`, `#ideas`). 
+- **Search by Tag**: Type a tag name in the global search bar to see all matching chats across different folders.
+
 ---
 
 ## 🔮 Roadmap & Future Features
@@ -91,7 +96,7 @@ We are constantly working to improve AI Chat Manager. Here's what's coming next:
 - **🔍 Global Search**: Quickly find any chat in your library. ✅
 - **📤 Export & Import**: Backup your data to JSON and restore it anywhere. ✅
 - **🤖 More AI Adapters**: Support for Claude, Perplexity, and HuggingChat.
-- **🏷️ Tags & Favorites**: Pin important chats and organize with #tags.
+- **🏷️ Tags & Favorites**: Pin important chats and organize with #tags. ✅
 - **🌓 Dark/Light Mode**: User-selectable themes. ✅
 
 ---

@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { MoreVertical, Edit2, Trash2, Pin, Tag } from 'lucide-react';
 
 interface ActionMenuProps {
     onRename: () => void;
     onDelete: () => void;
-    onMove?: () => void; // Placeholder for now
+    onTogglePin?: () => void;
+    onAddTag?: () => void;
+    isPinned?: boolean;
 }
 
-export const ActionMenu: React.FC<ActionMenuProps> = ({ onRename, onDelete }) => {
+export const ActionMenu: React.FC<ActionMenuProps> = ({ onRename, onDelete, onTogglePin, onAddTag, isPinned }) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +34,23 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({ onRename, onDelete }) =>
 
             {isOpen && (
                 <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg z-50 overflow-hidden">
+                    {onTogglePin && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsOpen(false); onTogglePin(); }}
+                            className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                        >
+                            <Pin size={14} className={isPinned ? "fill-current" : ""} />
+                            {isPinned ? 'Unpin' : 'Pin'}
+                        </button>
+                    )}
+                    {onAddTag && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsOpen(false); onAddTag(); }}
+                            className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                        >
+                            <Tag size={14} /> Add Tag
+                        </button>
+                    )}
                     <button
                         onClick={(e) => { e.stopPropagation(); setIsOpen(false); onRename(); }}
                         className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
